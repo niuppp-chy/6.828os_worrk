@@ -59,7 +59,8 @@ entry:
 	# Turn on paging.
 	movl	%cr0, %eax
 	orl	$(CR0_PE|CR0_PG|CR0_WP), %eax
-	movl	%eax, %cr0
+	# 如果把下面这行删掉，那么当运行到这条指令之后就会发生crash！！！
+	movl	%eax, %cr0 # 这条指令之后，虚拟地址就建立起来了
 
 	# Now paging is enabled, but we're still running at a low EIP
 	# (why is this okay?).  Jump up above KERNBASE before entering
@@ -92,5 +93,6 @@ spin:	jmp	spin
 bootstack:
 	.space		KSTKSIZE
 	.globl		bootstacktop   
+// 在数据段中定义栈顶
 bootstacktop:
 

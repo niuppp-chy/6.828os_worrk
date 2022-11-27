@@ -26,12 +26,14 @@ start:
   #   address line 20 is tied low, so that addresses higher than
   #   1MB wrap around to zero by default.  This code undoes this.
 seta20.1:
-  inb     $0x64,%al               # Wait for not busy
+  # %al寄存器中的值代表什么？
+  inb     $0x64,%al               # Wait for not busy 
   testb   $0x2,%al
   jnz     seta20.1
 
+  # 下面两句的含义是？
   movb    $0xd1,%al               # 0xd1 -> port 0x64
-  outb    %al,$0x64
+  outb    %al,$0x64  # 向I/O端口0x64写入一个字节
 
 seta20.2:
   inb     $0x64,%al               # Wait for not busy
@@ -53,6 +55,7 @@ seta20.2:
   # Jump to next instruction, but in 32-bit code segment.
   # Switches processor into 32-bit mode.
   ljmp    $PROT_MODE_CSEG, $protcseg
+
 
   .code32                     # Assemble for 32-bit mode
 protcseg:

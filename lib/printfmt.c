@@ -46,7 +46,7 @@ printnum(void (*putch)(int, void*), void *putdat,
 	}
 
 	// then print this (the least significant) digit
-	putch("0123456789abcdef"[num % base], putdat);
+	putch("0123456789abcdef"[num % base], putdat); // ?
 }
 
 // Get an unsigned int of various possible sizes from a varargs list,
@@ -54,11 +54,11 @@ printnum(void (*putch)(int, void*), void *putdat,
 static unsigned long long
 getuint(va_list *ap, int lflag)
 {
-	if (lflag >= 2)
+	if (lflag >= 2) // %lld %llo
 		return va_arg(*ap, unsigned long long);
-	else if (lflag)
+	else if (lflag) // %ld
 		return va_arg(*ap, unsigned long);
-	else
+	else // %d
 		return va_arg(*ap, unsigned int);
 }
 
@@ -79,6 +79,10 @@ getint(va_list *ap, int lflag)
 // Main function to format and print a string.
 void printfmt(void (*putch)(int, void*), void *putdat, const char *fmt, ...);
 
+
+// print.c中会调用
+// *putdat: 需要打印的字符的个数
+// 
 void
 vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 {
@@ -89,6 +93,9 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 	char padc;
 
 	while (1) {
+
+		// cprint("5555"); 可以这样打印
+		// 或 cprint("5555 %d", i);
 		while ((ch = *(unsigned char *) fmt++) != '%') {
 			if (ch == '\0')
 				return;
@@ -102,6 +109,9 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 		lflag = 0;
 		altflag = 0;
 	reswitch:
+
+		
+		// 比如： cprintf(" deedy %d, %s， %o", i, s, i);
 		switch (ch = *(unsigned char *) fmt++) {
 
 		// flag to pad on the right
@@ -206,10 +216,13 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 		// (unsigned) octal
 		case 'o':
 			// Replace this with your code.
-			putch('X', putdat);
-			putch('X', putdat);
-			putch('X', putdat);
-			break;
+			// putch('X', putdat);
+			// putch('X', putdat);
+			// putch('X', putdat);
+			// 解析i
+			num = getuint(&ap, lflag);
+			base = 8;
+			goto number;
 
 		// pointer
 		case 'p':
@@ -224,6 +237,8 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 		case 'x':
 			num = getuint(&ap, lflag);
 			base = 16;
+
+
 		number:
 			printnum(putch, putdat, num, base, width, padc);
 			break;

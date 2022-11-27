@@ -15,13 +15,15 @@ test_backtrace(int x)
 	if (x > 0)
 		test_backtrace(x-1);
 	else
-		mon_backtrace(0, 0, 0);
+		mon_backtrace(0, 0, 0); // 只会被调用一次
 	cprintf("leaving test_backtrace %d\n", x);
 }
 
 void
 i386_init(void)
 {
+	// 在ld中定义的？
+	// 什么意思？
 	extern char edata[], end[];
 
 	// Before doing anything else, complete the ELF loading process.

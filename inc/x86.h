@@ -9,11 +9,14 @@ breakpoint(void)
 	asm volatile("int3");
 }
 
+//
 static inline uint8_t
 inb(int port)
 {
 	uint8_t data;
-	asm volatile("inb %w1,%0" : "=a" (data) : "d" (port));
+	asm volatile("inb %w1,%0" : "=a" (data) /* 输出寄存器 %eax */: "d" (port) /* 输入寄存器 %edx */);
+	// 把%eax中的数据存入data
+	// 把port数据存入%edx
 	return data;
 }
 
@@ -64,6 +67,8 @@ static inline void
 outb(int port, uint8_t data)
 {
 	asm volatile("outb %0,%w1" : : "a" (data), "d" (port));
+	// 把port数据存入%eax
+	// 把data数据存入%edx
 }
 
 static inline void
@@ -78,6 +83,8 @@ outsb(int port, const void *addr, int cnt)
 static inline void
 outw(int port, uint16_t data)
 {
+	// "a" (data), "d" (port)  输入寄存器，即把data存入eax寄存器，把port存入edx寄存器
+	// a: eax  d: edx
 	asm volatile("outw %0,%w1" : : "a" (data), "d" (port));
 }
 
@@ -207,6 +214,8 @@ write_eflags(uint32_t eflags)
 	asm volatile("pushl %0; popfl" : : "r" (eflags));
 }
 
+
+//
 static inline uint32_t
 read_ebp(void)
 {

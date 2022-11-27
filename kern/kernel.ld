@@ -23,6 +23,8 @@ SECTIONS
 	}
 
 	/* Include debugging information in kernel memory */
+	/* stab section ？ 这个section存放什么数据？ */
+	/* 调试信息指的是什么？一些文件的符号表？ */
 	.stab : {
 		PROVIDE(__STAB_BEGIN__ = .);
 		*(.stab);

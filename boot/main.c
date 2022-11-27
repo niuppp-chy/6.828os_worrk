@@ -30,6 +30,7 @@
  **********************************************************************/
 
 #define SECTSIZE	512
+// 这个0x10000代表什么？ kernel.img从这里开始？
 #define ELFHDR		((struct Elf *) 0x10000) // scratch space
 
 void readsect(void*, uint32_t);

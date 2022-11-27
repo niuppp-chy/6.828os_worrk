@@ -138,25 +138,33 @@ memset(void *v, int c, size_t n)
 	return v;
 }
 
+
+//
 void *
 memmove(void *dst, const void *src, size_t n)
 {
 	const char *s;
 	char *d;
 
-	s = src;
+	s = src; // const可以赋给const！！！
 	d = dst;
-	if (s < d && s + n > d) {
-		s += n;
+	if (s < d && s + n > d) { // 表示src的最后一部分数据已经被dst覆盖掉
+		s += n; // 让s指令数据的末尾，从末尾开始往前拷贝！！！这样在拷贝完之后，原数据的最后一部分buffer会被改变！！！
 		d += n;
 		if ((int)s%4 == 0 && (int)d%4 == 0 && n%4 == 0)
+			// 把这些值分别存入%edx %esi %ecx中，并把src拷贝到dst
+			// movsl ...
+			// cc: 改变了flags寄存器时需要加上这个
+			// memory： 当写入一个变量时，需要 // 这里是？
 			asm volatile("std; rep movsl\n"
 				:: "D" (d-4), "S" (s-4), "c" (n/4) : "cc", "memory");
 		else
 			asm volatile("std; rep movsb\n"
 				:: "D" (d-1), "S" (s-1), "c" (n) : "cc", "memory");
+
 		// Some versions of GCC rely on DF being clear
 		asm volatile("cld" ::: "cc");
+
 	} else {
 		if ((int)s%4 == 0 && (int)d%4 == 0 && n%4 == 0)
 			asm volatile("cld; rep movsl\n"

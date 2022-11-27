@@ -5,6 +5,9 @@
 # where the GNUmakefile is located.
 #
 
+# $(V)$(LD) $(LDFLAGS) -N -e start -Ttext 0x7C00 -o $@.out $^
+# 这个7C00不能改，因为BIOS装载boot sector到内存的7C00处，改动会影响boot程序的运行！！！
+
 OBJDIRS += boot
 
 BOOT_OBJS := $(OBJDIR)/boot/boot.o $(OBJDIR)/boot/main.o

@@ -62,16 +62,23 @@ serial_intr(void)
 		cons_intr(serial_proc_data);
 }
 
+
+// 
 static void
 serial_putc(int c)
 {
 	int i;
 
+	// 这个for循环应该是在检测当前是否能发送指令到console控制器？
 	for (i = 0;
-	     !(inb(COM1 + COM_LSR) & COM_LSR_TXRDY) && i < 12800;
+		// inb(port): 把port放入%edx, 从%eax中读数据回来
+		// 0x3FD 代表什么？
+	     !(inb(COM1 + COM_LSR) & COM_LSR_TXRDY) && i < 12800; // 这句话的目的是？
 	     i++)
 		delay();
 
+	// 把控制信号 和 数据 写到%eax %edx，之后传输到console相关寄存器
+	// 0x3F8
 	outb(COM1 + COM_TX, c);
 }
 
@@ -115,6 +122,7 @@ lpt_putc(int c)
 
 	for (i = 0; !(inb(0x378+1) & 0x80) && i < 12800; i++)
 		delay();
+	
 	outb(0x378+0, c);
 	outb(0x378+2, 0x08|0x04|0x01);
 	outb(0x378+2, 0x08);
@@ -195,9 +203,13 @@ cga_putc(int c)
 	if (crt_pos >= CRT_SIZE) {
 		int i;
 
+		// crt_buf + CRT_COLS -> crt_buf
+		// 把这个数组的前80个元素清空，把后面的字符搬到前面，并把最后的80个元素赋为0x700
+		// 最后，更新crt_pos索引
 		memmove(crt_buf, crt_buf + CRT_COLS, (CRT_SIZE - CRT_COLS) * sizeof(uint16_t));
 		for (i = CRT_SIZE - CRT_COLS; i < CRT_SIZE; i++)
 			crt_buf[i] = 0x0700 | ' ';
+
 		crt_pos -= CRT_COLS;
 	}
 
@@ -433,7 +445,9 @@ static void
 cons_putc(int c)
 {
 	serial_putc(c);
-	lpt_putc(c);
+
+	lpt_putc(c); // ？
+
 	cga_putc(c);
 }
 

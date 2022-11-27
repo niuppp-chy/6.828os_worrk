@@ -9,7 +9,7 @@ struct Elf {
 	uint16_t e_type;
 	uint16_t e_machine;
 	uint32_t e_version;
-	uint32_t e_entry;
+	uint32_t e_entry; // hold the link address of the entry point in the program
 	uint32_t e_phoff;
 	uint32_t e_shoff;
 	uint32_t e_flags;
